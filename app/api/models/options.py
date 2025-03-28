@@ -17,7 +17,4 @@ class Option(Base):
         return f"<Option {self.option_text}>"
 
     def to_dict(self):
-        return {
-            "option_text": self.option_text,
-            "is_correct": self.is_correct
-        }
+        return {"option_text": self.option_text, "is_correct": self.is_correct}

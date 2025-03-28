@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 from app.core.models.base import Base
@@ -17,6 +17,4 @@ class Level(Base):
         return f"<Level {self.name}>"
 
     def to_dict(self):
-        return {
-            "name": self.name
-        }
+        return {"name": self.name}

@@ -17,7 +17,4 @@ class Topic(Base):
         return f"<Topic {self.name}>"
 
     def to_dict(self):
-        return {
-            "name": self.name,
-            "image": self.image
-        }
+        return {"name": self.name, "image": self.image}

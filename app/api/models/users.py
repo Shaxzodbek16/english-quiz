@@ -9,17 +9,21 @@ class User(Base):
 
     first_name = Column(String(255), nullable=False)
     last_name = Column(String(255), nullable=True)
-    telegram_id = Column(BigInteger, unique=True, nullable=False)
+    telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
+    language = Column(String(10), nullable=True, default="en")
     is_active = Column(Boolean, nullable=False, default=True)
-    is_admin = Column(Boolean, nullable=False, default=False)
-    is_superuser = Column(Boolean, nullable=False, default=False)
 
     user_tests = relationship("UserTest", back_populates="user")
     user_statistics = relationship("UserStatistic", back_populates="user")
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}" if self.last_name else self.first_name
+        return (
+            self.first_name
+            if self.last_name is None
+            else f"{self.first_name} {self.last_name}"
+        )
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -28,7 +32,7 @@ class User(Base):
             "telegram_id": self.telegram_id,
             "is_active": self.is_active,
             "is_superuser": self.is_superuser,
-            "is_admin": self.is_admin
+            "is_admin": self.is_admin,
         }
 
     def __repr__(self):

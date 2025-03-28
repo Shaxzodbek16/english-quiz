@@ -5,6 +5,7 @@ from app.api.models.user_statistics import UserStatistic
 from app.api.models.options import Option
 from app.api.models.user_tests import UserTest
 from app.api.models.users import User
+from app.api.models.admins import AdminUsers
 
 __all__ = [
     "Test",
@@ -14,4 +15,5 @@ __all__ = [
     "Option",
     "UserTest",
     "User",
+    "AdminUsers",
 ]

@@ -28,5 +28,5 @@ class UserStatistic(Base):
             "topic_id": self.topic_id,
             "total_tests": self.total_tests,
             "correct_answers": self.correct_answers,
-            "total_time_spent_minutes": self.total_time_spent_minutes
+            "total_time_spent_minutes": self.total_time_spent_minutes,
         }

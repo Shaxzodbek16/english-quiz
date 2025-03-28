@@ -12,8 +12,9 @@ class Test(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"), nullable=False)
     question = Column(Text, nullable=False)
     image = Column(String(255), nullable=True)
-    type: Mapped[TestTypeEnum] = mapped_column(Enum(TestTypeEnum), nullable=False)
-
+    type: Mapped[TestTypeEnum] = mapped_column(
+        Enum(TestTypeEnum, name="testtypeenum"), nullable=False
+    )
     level = relationship("Level", back_populates="tests")
     topic = relationship("Topic", back_populates="tests")
     options = relationship("Option", back_populates="test")
@@ -27,5 +28,5 @@ class Test(Base):
             "level_id": self.level_id,
             "topic_id": self.topic_id,
             "question": self.question,
-            "type": self.type
+            "type": self.type,
         }

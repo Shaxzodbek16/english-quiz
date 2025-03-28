@@ -23,5 +23,5 @@ class UserTest(Base):
             "user_id": self.user_id,
             "test_id": self.test_id,
             "selected_option_id": self.selected_option_id,
-            "is_correct": self.is_correct
+            "is_correct": self.is_correct,
         }
