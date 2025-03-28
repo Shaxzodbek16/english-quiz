@@ -7,6 +7,7 @@ from alembic import context
 
 from app.core.models.base import Base
 from app.core.settings import get_settings, Settings
+from app.api.models import *  # noqa
 
 settings: Settings = get_settings()
 

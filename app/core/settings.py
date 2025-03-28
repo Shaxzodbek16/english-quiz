@@ -4,20 +4,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # API
-    API_V1_STR: str
-    BASE_URL: str
+    API_V1_STR: str = "/api/v1"
+    BASE_URL: str = "http://localhost:8000"
 
     # PROJECT METADATA
-    PROJECT_NAME: str
-    PROJECT_DESCRIPTION: str
-    PROJECT_VERSION: str
+    PROJECT_NAME: str = "FastAPI Project"
+    PROJECT_DESCRIPTION: str = "FastAPI Project Description"
+    PROJECT_VERSION: str = "0.1.0"
 
     # POSTGRES CREDENTIALS
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str
-    POSTGRES_PORT: str
-    POSTGRES_DATABASE: str
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: str = "5432"
+    POSTGRES_DATABASE: str = "postgres"
 
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -28,4 +28,4 @@ class Settings(BaseSettings):
 
 @cache
 def get_settings() -> Settings:
-    return Settings()  # noqa
+    return Settings()
