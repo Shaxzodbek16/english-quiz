@@ -15,4 +15,7 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["./run.sh"]
+RUN chmod +x run.sh
+RUN chmod +x bot.sh
+
+CMD ["sh", "-c", "./run.sh & ./bot.sh & wait"]
