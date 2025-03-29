@@ -4,15 +4,12 @@ from app.core.settings import get_settings, Settings
 settings: Settings = get_settings()
 
 router = APIRouter(
-    prefix=settings.API_V1_STR + "/admin/authentication",
+    prefix=settings.API_V1_STR + "/admin/authentication/",
     tags=["Admin authentication"],
     redirect_slashes=False,
-    responses={
-        status.HTTP_401_UNAUTHORIZED: {
-            "description": "Authentication credentials were not provided or are invalid."
-        },
-        status.HTTP_403_FORBIDDEN: {
-            "description": "You do not have permission to access this resource."
-        },
-    },
 )
+
+
+@router.post("login/")
+async def admin_login():
+    pass

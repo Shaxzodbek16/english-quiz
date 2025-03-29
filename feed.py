@@ -54,7 +54,7 @@ class Feed:
             user = User(
                 first_name=self.__faker.first_name(),
                 last_name=self.__faker.last_name(),
-                telegram_id=self.__faker.random_int(min=10 ** 10, max=10 ** 12),
+                telegram_id=self.__faker.random_int(min=10**10, max=10**12),
                 is_active=self.__faker.boolean(chance_of_getting_true=80),
                 language=random.choice(["en", "uz", "ru"]),
             )
@@ -83,7 +83,7 @@ class Feed:
         return count
 
     async def _feed_test_model(
-            self, *, count: int, level_id: int, topic_id: int
+        self, *, count: int, level_id: int, topic_id: int
     ) -> int:
         for _ in range(count):
             test = Test(
@@ -100,7 +100,7 @@ class Feed:
         return count
 
     async def _feed_user_statistics_model(
-            self, *, count: int, user_id: int, level_id: int, topic_id: int
+        self, *, count: int, user_id: int, level_id: int, topic_id: int
     ) -> int:
         for _ in range(count):
             user_statistics = UserStatistic(
@@ -127,7 +127,7 @@ class Feed:
         return count
 
     async def _feed_user_tests_model(
-            self, *, count: int, user_id: int, test_id: int, option_id: int
+        self, *, count: int, user_id: int, test_id: int, option_id: int
     ) -> int:
         for _ in range(count):
             user_test = UserTest(

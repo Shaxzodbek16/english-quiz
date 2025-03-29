@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     BOT_TOKEN: str = "token"
     SUPERUSERS: str = "5006482590,6521856185"
 
+    # JWT CREDENTIALS
+    SECRET_KEY = "english_quiz_api_secret_key"
+    ALGORITHM = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES = 15
+    REFRESH_TOKEN_EXPIRE_DAYS = 7
+
     model_config = SettingsConfigDict(env_file=".env")
 
     @property

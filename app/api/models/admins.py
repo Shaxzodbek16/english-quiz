@@ -20,9 +20,13 @@ class AdminUsers(Base):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
+            "telegram_id": self.telegram_id,
             "is_admin": self.is_admin,
             "is_superuser": self.is_superuser,
         }
 
     def __repr__(self):
+        return f"<AdminUser {self.first_name} {self.last_name}>"
+
+    def __str__(self):
         return f"<AdminUser {self.first_name} {self.last_name}>"

@@ -1,11 +1,12 @@
 import asyncio
 
+from faker import Faker
+from sqlalchemy import text
+
+from app.api.utils.admins import hash_password
 from app.core.databases.postgres import get_session_without_depends
 from app.api.models.admins import AdminUsers
 from app.core.settings import get_settings, Settings
-from faker import Faker
-
-from sqlalchemy import text
 
 settings: Settings = get_settings()
 fake = Faker()
@@ -30,7 +31,7 @@ async def create_super_user() -> bool:
                     first_name=fake.first_name(),
                     last_name=fake.last_name(),
                     email="admin@gmail.com",
-                    password="12345678",  # TODO: hash password
+                    password=hash_password("12345678"),
                     is_admin=True,
                     is_superuser=True,
                     telegram_id=telegram_id,
