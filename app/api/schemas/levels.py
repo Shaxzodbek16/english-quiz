@@ -7,14 +7,14 @@ class BaseLevel(BaseModel):
     image: str | None = None
 
 
-class CreateLevel(BaseLevel):
+class CreateLevelSchema(BaseLevel):
     pass
 
 
-class UpdateLevel(BaseLevel):
+class UpdateLevelSchema(BaseLevel):
     created_at: datetime | None
     updated_at: datetime | None
 
 
-class ResponseLevel(UpdateLevel):
+class ResponseLevelSchema(UpdateLevelSchema):
     id: int

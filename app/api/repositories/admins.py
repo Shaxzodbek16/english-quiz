@@ -1,0 +1,2 @@
+class AdminRepository:
+    pass

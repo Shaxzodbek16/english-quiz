@@ -1,4 +1,4 @@
-from app.api.schemas.levels import CreateLevel, UpdateLevel
+from app.api.schemas.levels import CreateLevelSchema, UpdateLevelSchema
 
 
 class LevelController:
@@ -15,10 +15,10 @@ class LevelController:
     async def get_level(self, level_id: int):
         pass
 
-    async def create_level(self, level: CreateLevel):
+    async def create_level(self, level: CreateLevelSchema):
         pass
 
-    async def update_level(self, level: UpdateLevel, level_id: int):
+    async def update_level(self, level: UpdateLevelSchema, level_id: int):
         pass
 
     async def delete_level(self, level_id: int):

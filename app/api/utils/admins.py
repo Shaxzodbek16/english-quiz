@@ -2,14 +2,17 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, UTC
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.api.models import AdminUsers
+from app.api.models.admins import AdminUsers
+from app.api.models.users import User
 from app.core.databases.postgres import get_general_session
 from app.core.settings import Settings, get_settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/")
 
 
 def hash_password(password: str) -> str:
@@ -49,7 +52,9 @@ class JWTHandler:
             expires_delta or timedelta(days=self.__settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
 
-    async def __find_user(self, payload: dict, session: AsyncSession) -> AdminUsers:
+    async def __find_user(
+        self, payload: dict, session: AsyncSession
+    ) -> AdminUsers | User:
         email = payload.get("email", None)
         telegram_id = payload.get("telegram_id", None)
         if telegram_id in self.__settings.get_superusers:
@@ -73,11 +78,21 @@ class JWTHandler:
             user = res.scalar_one_or_none()
             if user is not None:
                 return user
+
+            res = await session.execute(
+                select(User).where(User.telegram_id == telegram_id)
+            )
+            user = res.scalar_one_or_none()
+            if user is not None:
+                return user
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
         )
 
-    async def get_user_by_token(self, token: str, session: AsyncSession) -> AdminUsers:
+    async def get_user_by_token(
+        self, token: str, session: AsyncSession
+    ) -> AdminUsers | User:
         try:
             payload = jwt.decode(
                 token,
@@ -96,6 +111,7 @@ jwt_handler = JWTHandler(get_settings())
 
 
 async def get_current_user(
-    token: str, session: AsyncSession = Depends(get_general_session)
-) -> AdminUsers:
+    token: str = Depends(oauth2_scheme),
+    session: AsyncSession = Depends(get_general_session),
+) -> AdminUsers | User:
     return await jwt_handler.get_user_by_token(token, session)
