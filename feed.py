@@ -54,7 +54,7 @@ class Feed:
             user = User(
                 first_name=self.__faker.first_name(),
                 last_name=self.__faker.last_name(),
-                telegram_id=self.__faker.random_int(min=10**10, max=10**12),
+                telegram_id=self.__faker.random_int(min=10 ** 10, max=10 ** 12),
                 is_active=self.__faker.boolean(chance_of_getting_true=80),
                 language=random.choice(["en", "uz", "ru"]),
             )
@@ -83,7 +83,7 @@ class Feed:
         return count
 
     async def _feed_test_model(
-        self, *, count: int, level_id: int, topic_id: int
+            self, *, count: int, level_id: int, topic_id: int
     ) -> int:
         for _ in range(count):
             test = Test(
@@ -100,7 +100,7 @@ class Feed:
         return count
 
     async def _feed_user_statistics_model(
-        self, *, count: int, user_id: int, level_id: int, topic_id: int
+            self, *, count: int, user_id: int, level_id: int, topic_id: int
     ) -> int:
         for _ in range(count):
             user_statistics = UserStatistic(
@@ -127,7 +127,7 @@ class Feed:
         return count
 
     async def _feed_user_tests_model(
-        self, *, count: int, user_id: int, test_id: int, option_id: int
+            self, *, count: int, user_id: int, test_id: int, option_id: int
     ) -> int:
         for _ in range(count):
             user_test = UserTest(
@@ -143,23 +143,20 @@ class Feed:
 
     async def run(self):
         await self.__drop_all_tables()
-        print("Starting feed...")
-        print("\n" * 3)
-        max_users = await self._feed_user_model(10_000)
-        max_levels = await self._feed_level_model(200)
-        max_topics = await self._feed_topic_model(200)
+        max_users = await self._feed_user_model(100)
+        max_levels = await self._feed_level_model(20)
+        max_topics = await self._feed_topic_model(20)
         max_tests = await self._feed_test_model(
-            count=10_000, level_id=max_levels, topic_id=max_topics
+            count=100, level_id=max_levels, topic_id=max_topics
         )
-        max_options = await self._feed_option_model(count=100_000, test_id=max_tests)
+        max_options = await self._feed_option_model(count=100, test_id=max_tests)
         await self._feed_user_tests_model(
-            count=100_000, user_id=max_users, test_id=max_tests, option_id=max_options
+            count=100, user_id=max_users, test_id=max_tests, option_id=max_options
         )
         await self._feed_user_statistics_model(
-            count=3_000, user_id=max_users, level_id=max_levels, topic_id=max_topics
+            count=30, user_id=max_users, level_id=max_levels, topic_id=max_topics
         )
-        print("Successfully fed the data to the models")
-        print("\n" * 3)
+        print("\nSuccessfully fed the data to the models\n")
 
 
 async def main():
