@@ -30,7 +30,7 @@ async def create_super_user() -> bool:
                 admin = AdminUsers(
                     first_name=fake.first_name(),
                     last_name=fake.last_name(),
-                    email="admin@gmail.com",
+                    email=fake.email(),
                     password=hash_password("12345678"),
                     is_admin=True,
                     is_superuser=True,

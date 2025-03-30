@@ -11,8 +11,11 @@ from app.api.models.users import User
 from app.core.databases.postgres import get_general_session
 from app.core.settings import Settings, get_settings
 
+settings: Settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_STR}/admin/authentication/login/",
+)
 
 
 def hash_password(password: str) -> str:
@@ -24,8 +27,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 class JWTHandler:
-    def __init__(self, settings: Settings) -> None:
-        self.__settings = settings
+    def __init__(self, _settings: Settings) -> None:
+        self.__settings = _settings
 
     def create_token(self, data: dict, expires_delta: timedelta) -> str:
         to_encode = data.copy()
@@ -64,13 +67,6 @@ class JWTHandler:
             user = res.scalar_one_or_none()
             if user is not None:
                 return user
-        if email is not None:
-            res = await session.execute(
-                select(AdminUsers).where(AdminUsers.email == email)
-            )
-            user = res.scalar_one_or_none()
-            if user is not None:
-                return user
         if telegram_id is not None:
             res = await session.execute(
                 select(AdminUsers).where(AdminUsers.telegram_id == telegram_id)
@@ -81,6 +77,13 @@ class JWTHandler:
 
             res = await session.execute(
                 select(User).where(User.telegram_id == telegram_id)
+            )
+            user = res.scalar_one_or_none()
+            if user is not None:
+                return user
+        if email is not None:
+            res = await session.execute(
+                select(AdminUsers).where(AdminUsers.email == email)
             )
             user = res.scalar_one_or_none()
             if user is not None:

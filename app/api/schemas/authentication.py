@@ -1,18 +1,20 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class LoginSchema(BaseModel):
-    telegram_id: int
-    email: str | None = None
-    password: str | None = None
-
-
-class TokenResponseSchema(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "Bearer"
+class AdminLoginSchema(BaseModel):
+    telegram_id_or_email: int | str
+    password: str
+    model_config = ConfigDict(from_attributes=True)
 
 
 class RefreshTokenResponseSchema(BaseModel):
     access_token: str
     token_type: str = "Bearer"
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TokenResponseSchema(RefreshTokenResponseSchema):
+    refresh_token: str
+
+    model_config = ConfigDict(from_attributes=True)

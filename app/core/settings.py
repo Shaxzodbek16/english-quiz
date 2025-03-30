@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     # API
     API_V1_STR: str = "/api/v1"
-    BASE_URL: str = "http://localhost:8000"
+    BASE_URL: str = "http://localhost:8000/"
 
     # PROJECT METADATA
     PROJECT_NAME: str = "FastAPI Project"

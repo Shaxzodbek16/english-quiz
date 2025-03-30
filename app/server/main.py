@@ -6,21 +6,15 @@ from starlette.middleware.cors import CORSMiddleware
 from app.core.settings import get_settings, Settings
 from app.server import create_super_user
 
-from app.api.routers.admins import router as admin_router
-from app.api.routers.authentication import router as authentication_router
-from app.api.routers.levels import router as levels_router
-from app.api.routers.options import router as options_router
-from app.api.routers.tests import router as tests_router
-from app.api.routers.topics import router as topics_router
-from app.api.routers.user_statistics import router as user_statistics_router
-from app.api.routers.user_tests import router as user_tests_router
-from app.api.routers.users import router as users_router
+from app.api.routers import v1_base_router
 
 settings: Settings = get_settings()
 
 
 def get_ready() -> None:
-    os.makedirs("media/", exist_ok=True)
+    os.makedirs("media/uploads/images", exist_ok=True)
+    os.makedirs("media/uploads/videos", exist_ok=True)
+    os.makedirs("media/uploads/documents", exist_ok=True)
     os.makedirs("static/", exist_ok=True)
 
 
@@ -33,16 +27,9 @@ def get_app() -> FastAPI:
         description=settings.PROJECT_DESCRIPTION,
         version=settings.PROJECT_VERSION,
         docs_url="/",
+        redoc_url="/redoc",
     )
-    app.include_router(admin_router)
-    app.include_router(authentication_router)
-    app.include_router(levels_router)
-    app.include_router(options_router)
-    app.include_router(tests_router)
-    app.include_router(topics_router)
-    app.include_router(user_statistics_router)
-    app.include_router(user_tests_router)
-    app.include_router(users_router)
+    app.include_router(v1_base_router)
     return app
 
 

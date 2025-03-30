@@ -7,7 +7,7 @@ class AdminUsers(Base):
 
     first_name = Column(String(255), nullable=False)
     last_name = Column(String(255), nullable=True)
-    email = Column(String(255), nullable=False, index=True)
+    email = Column(String(255), nullable=False, index=True, unique=True)
     telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
     password = Column(String(255), nullable=False)
 

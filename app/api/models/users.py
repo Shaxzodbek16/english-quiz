@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, BigInteger, Boolean
+from sqlalchemy import Column, String, BigInteger, Boolean
 from sqlalchemy.orm import relationship
 
 from app.core.models.base import Base
@@ -31,8 +31,6 @@ class User(Base):
             "last_name": self.last_name,
             "telegram_id": self.telegram_id,
             "is_active": self.is_active,
-            "is_superuser": self.is_superuser,
-            "is_admin": self.is_admin,
         }
 
     def __repr__(self):

@@ -3,7 +3,6 @@ from typing import Sequence
 
 from app.api.models import AdminUsers
 from app.api.utils.admins import get_current_user
-from app.core.settings import get_settings, Settings
 from app.api.controllers.levels import LevelController
 from app.api.schemas.levels import (
     ResponseLevelSchema,
@@ -12,10 +11,9 @@ from app.api.schemas.levels import (
 )
 from app.api.constants.levels.docs import LEVEL_DOCS
 
-settings: Settings = get_settings()
 
 router = APIRouter(
-    prefix=settings.API_V1_STR + "/levels",
+    prefix="/levels",
     tags=["Levels"],
     redirect_slashes=False,
 )

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 
@@ -6,15 +6,20 @@ class BaseLevel(BaseModel):
     name: str
     image: str | None = None
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class CreateLevelSchema(BaseLevel):
-    pass
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UpdateLevelSchema(BaseLevel):
     created_at: datetime | None
     updated_at: datetime | None
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class ResponseLevelSchema(UpdateLevelSchema):
     id: int
+    model_config = ConfigDict(from_attributes=True)
