@@ -15,7 +15,9 @@ def get_ready() -> None:
     os.makedirs("media/uploads/images", exist_ok=True)
     os.makedirs("media/uploads/videos", exist_ok=True)
     os.makedirs("media/uploads/documents", exist_ok=True)
-    os.makedirs("static/", exist_ok=True)
+    os.makedirs("static/images", exist_ok=True)
+    os.makedirs("static/videos", exist_ok=True)
+    os.makedirs("static/documents", exist_ok=True)
 
 
 def get_app() -> FastAPI:
