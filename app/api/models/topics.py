@@ -10,8 +10,10 @@ class Topic(Base):
     name = Column(String(255), unique=True, nullable=False)
     image = Column(String(255), nullable=True)
 
-    tests = relationship("Test", back_populates="topic")
-    user_statistics = relationship("UserStatistic", back_populates="topic")
+    tests = relationship("Test", back_populates="topic", cascade="all, delete")
+    user_statistics = relationship(
+        "UserStatistic", back_populates="topic", cascade="all, delete"
+    )
 
     def __repr__(self):
         return f"<Topic {self.name}>"

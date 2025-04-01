@@ -1,7 +1,7 @@
 from fastapi import Depends, APIRouter, status, Path
 from typing import Sequence
 
-from app.api.models import AdminUsers
+from app.api.models import AdminUsers, User
 from app.api.utils.admins import get_current_user
 from app.api.controllers.levels import LevelController
 from app.api.schemas.levels import (
@@ -10,7 +10,6 @@ from app.api.schemas.levels import (
     UpdateLevelSchema,
 )
 from app.api.constants.levels.docs import LEVEL_DOCS
-
 
 router = APIRouter(
     prefix="/levels",
@@ -27,6 +26,7 @@ router = APIRouter(
     description=LEVEL_DOCS["get"]["description"],
 )
 async def get_all_levels(
+    current_user: AdminUsers | User = Depends(get_current_user),
     level_controller: LevelController = Depends(),
 ) -> Sequence[ResponseLevelSchema]:
     return await level_controller.get_all_levels()
@@ -39,11 +39,12 @@ async def get_all_levels(
     summary=LEVEL_DOCS["get_one"]["summary"],
     description=LEVEL_DOCS["get_one"]["description"],
 )
-async def get_level(
+async def get_level_by_id(
+    current_user: AdminUsers | User = Depends(get_current_user),
     level_id: int = Path(..., ge=1),
     level_controller: LevelController = Depends(),
 ) -> ResponseLevelSchema:
-    return await level_controller.get_level(level_id)
+    return await level_controller.get_level_by_id(level_id)
 
 
 @router.post(
@@ -56,10 +57,9 @@ async def get_level(
 async def create_level(
     level: CreateLevelSchema,
     level_controller: LevelController = Depends(),
-    current_user: AdminUsers = Depends(get_current_user),
+    current_user: AdminUsers | User = Depends(get_current_user),
 ) -> ResponseLevelSchema:
-
-    return await level_controller.create_level(level)
+    return await level_controller.create_level(level, current_user)
 
 
 @router.put(
@@ -71,10 +71,13 @@ async def create_level(
 )
 async def update_level(
     level: UpdateLevelSchema,
+    current_user: AdminUsers | User = Depends(get_current_user),
     level_id: int = Path(..., ge=1),
     level_controller: LevelController = Depends(),
 ) -> ResponseLevelSchema:
-    return await level_controller.update_level(level, level_id)
+    return await level_controller.update_level(
+        level=level, level_id=level_id, current_user=current_user
+    )
 
 
 @router.delete(
@@ -84,6 +87,10 @@ async def update_level(
     description=LEVEL_DOCS["delete"]["description"],
 )
 async def delete_level(
-    level_id: int = Path(..., ge=1), level_controller: LevelController = Depends()
+    level_id: int = Path(..., ge=1),
+    level_controller: LevelController = Depends(),
+    current_user: AdminUsers | User = Depends(get_current_user),
 ) -> None:
-    return await level_controller.delete_level(level_id)
+    return await level_controller.delete_level(
+        level_id=level_id, current_user=current_user
+    )

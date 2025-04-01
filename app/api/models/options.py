@@ -11,7 +11,7 @@ class Option(Base):
     option_text = Column(Text, nullable=False)
     is_correct = Column(Boolean, default=False)
 
-    test = relationship("Test", back_populates="options")
+    test = relationship("Test", back_populates="options", cascade="all, delete")
 
     def __repr__(self):
         return f"<Option {self.option_text}>"
