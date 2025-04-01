@@ -14,14 +14,17 @@ async def get_user_by_telegram_id(telegram_id: int) -> User | None:
 
 
 async def create_user(message: Message) -> tuple[User, bool]:
-    exist_use = await get_user_by_telegram_id(message.from_user.id)
-    if exist_use is not None:
-        return exist_use, True
+    new_user = message.from_user
+    if new_user is None:
+        raise ValueError("User not found in the message")
+    exist_user = await get_user_by_telegram_id(new_user.id)  # type: ignore
+    if exist_user is not None:
+        return exist_user, True
     user = User(
-        first_name=message.from_user.first_name,
-        last_name=message.from_user.last_name,
-        telegram_id=message.from_user.id,
-        language=message.from_user.language_code,
+        first_name=new_user.first_name,
+        last_name=new_user.last_name,
+        telegram_id=new_user.id,
+        language=new_user.language_code,
         is_active=True,
     )
     async with get_session_without_depends() as session:

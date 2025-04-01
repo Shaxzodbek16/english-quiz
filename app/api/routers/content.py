@@ -15,9 +15,12 @@ router = APIRouter(
     tags=["Content Management"],
     redirect_slashes=False,
 )
+
+
 def save_file(file_path: str, file_content: bytes):
     with open(file_path, "wb") as f:
         f.write(file_content)
+
 
 @router.post(
     "/upload/image/",
@@ -51,7 +54,7 @@ async def upload_image(image: UploadFile = File(...)) -> ContentResponseSchema:
     with open(file_path, "wb") as f:
         f.write(file_content)
     return ContentResponseSchema(
-        upload_to=file_path, link=settings.BASE_URL+ '/' + file_path
+        upload_to=file_path, link=settings.BASE_URL + "/" + file_path
     )
 
 
@@ -62,7 +65,9 @@ async def upload_image(image: UploadFile = File(...)) -> ContentResponseSchema:
     description=DOCS["video"],
     response_model=ContentResponseSchema,
 )
-async def upload_video(video: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()) -> ContentResponseSchema:
+async def upload_video(
+    video: UploadFile = File(...), background_tasks: BackgroundTasks = BackgroundTasks()
+) -> ContentResponseSchema:
     if video.filename is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -86,8 +91,9 @@ async def upload_video(video: UploadFile = File(...), background_tasks: Backgrou
     file_path = os.path.join(validations["video"]["path"], video.filename)
     background_tasks.add_task(save_file, file_path, file_content)
     return ContentResponseSchema(
-        upload_to=file_path, link=settings.BASE_URL + '/' + file_path
+        upload_to=file_path, link=settings.BASE_URL + "/" + file_path
     )
+
 
 @router.post(
     "/upload/document/",
@@ -97,8 +103,8 @@ async def upload_video(video: UploadFile = File(...), background_tasks: Backgrou
     response_model=ContentResponseSchema,
 )
 async def upload_document(
-        document: UploadFile = File(...),
-        background_tasks: BackgroundTasks = BackgroundTasks()
+    document: UploadFile = File(...),
+    background_tasks: BackgroundTasks = BackgroundTasks(),
 ) -> ContentResponseSchema:
     if document.filename is None:
         raise HTTPException(
@@ -123,5 +129,5 @@ async def upload_document(
     file_path = os.path.join(validations["document"]["path"], document.filename)
     background_tasks.add_task(save_file, file_path, file_content)
     return ContentResponseSchema(
-        upload_to=file_path, link=settings.BASE_URL + '/' + file_path
+        upload_to=file_path, link=settings.BASE_URL + "/" + file_path
     )
