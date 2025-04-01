@@ -2,14 +2,19 @@ from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
+from app.bot.constants.main import start_text, help_text
 from app.bot.controllers.users import create_user
-from app.bot.keyboards.inlinne.main import keyboard
+from app.bot.keyboards.inlinne.main import InlineKeyboard
 
 router = Router()
 
 
 @router.message(CommandStart())
 async def start_command(message: Message) -> None:
+    from_user = message.from_user
+    if from_user is None:
+        return
+    button = InlineKeyboard(message=message)
     try:
         user, is_old = await create_user(message)
     except Exception as e:
@@ -21,34 +26,16 @@ async def start_command(message: Message) -> None:
     if is_old:
         await message.answer("Welcome back! How can I assist you today?")
     else:
-        await message.answer(
-            f"Hello, {message.from_user.full_name} welcome\nto the English Grammar Test Bot!🎉\n"
-            "\n "
-            "📚What can I do?\n "
-            "✅ Help you improve your English grammar through interactive tests\n "
-            "✅ Provide topic-specific and level-based exercises\n "
-            "✅ Offer Google Translate support for quick translations\n "
-        )
+        await message.answer(start_text.format(from_user.first_name))
     await message.answer(
-        "Let’s get started! 🎯Choose an option below:", reply_markup=keyboard
+        "Let’s get started! 🎯Choose an option below:",
+        reply_markup=await button.start_command_reply_markup(),
     )
 
 
-@router.message(Command(commands=["help"]))
-async def help_command(message: Message) -> None:
-    await message.answer(
-        "Here are the commands you can use:\n"
-        "/start - Start the bot\n"
-        "/help - Get help with using the bot\n"
-        "/settings - Change your settings"
-    )
-
-
-@router.message(Command(commands=["settings"]))
-async def settings_command(message: Message) -> None:
-    await message.answer(
-        "Here are your settings:\n"
-        "1. Notifications: ON\n"
-        "2. Language: English\n"
-        "You can change these settings in the app."
-    )
+@router.message(Command("help"))
+async def show_help(message: Message):
+    from_user = message.from_user
+    if from_user is None:
+        return
+    await message.answer(help_text.format(from_user.first_name))
