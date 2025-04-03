@@ -19,3 +19,7 @@ def get_telegram_id(hashed_telegram_id: str) -> int:
         hashed_telegram_id, settings.SECRET_KEY, algorithms=["HS256"]
     )
     return decoded_data["telegram_id"]
+
+
+if __name__ == "__main__":
+    print(hash_telegram_id(256522998967))

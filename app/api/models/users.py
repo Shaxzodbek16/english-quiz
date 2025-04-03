@@ -31,6 +31,9 @@ class User(Base):
             "last_name": self.last_name,
             "telegram_id": self.telegram_id,
             "is_active": self.is_active,
+            "language": self.language,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }
 
     def __repr__(self):

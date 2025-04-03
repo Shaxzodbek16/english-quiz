@@ -19,7 +19,7 @@ class AuthenticationController:
         self.__token_handler = jwt_handler
 
     @staticmethod
-    async def _verify_password(password: str, plain_password: str) -> None:
+    async def __verify_password(password: str, plain_password: str) -> None:
         if not verify_password(password, plain_password):
             raise HTTPException(
                 detail="Email or password is incorrect",
@@ -36,7 +36,7 @@ class AuthenticationController:
                     detail="Email or password is incorrect",
                     status_code=status.HTTP_401_UNAUTHORIZED,
                 )
-            await self._verify_password(str(data.password), str(admin_user.password))
+            await self.__verify_password(str(data.password), str(admin_user.password))
             return TokenResponseSchema(
                 access_token=self.__token_handler.create_access_token(
                     admin_user.to_dict()
@@ -54,7 +54,7 @@ class AuthenticationController:
                     detail="Telegram ID or password is incorrect",
                     status_code=status.HTTP_401_UNAUTHORIZED,
                 )
-            await self._verify_password(str(data.password), str(admin_user.password))
+            await self.__verify_password(str(data.password), str(admin_user.password))
             return TokenResponseSchema(
                 access_token=self.__token_handler.create_access_token(
                     admin_user.to_dict()

@@ -14,7 +14,7 @@ admin_router = APIRouter(
     response_model=TokenResponseSchema,
     status_code=status.HTTP_200_OK,
 )
-async def admin_login(
+async def login(
     data: AdminLoginSchema,
     authentication_controller: AuthenticationController = Depends(),
 ) -> TokenResponseSchema:

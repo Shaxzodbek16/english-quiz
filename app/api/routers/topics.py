@@ -26,7 +26,7 @@ router = APIRouter(
     description=TOPIC_DOCS["get"]["description"],
 )
 async def get_all_topics(
-    current_user: AdminUsers | User = Depends(get_current_user),
+    current_user: AdminUsers | User = Depends(get_current_user),  # noqa
     topic_controller: TopicController = Depends(),
 ) -> Sequence[ResponseTopicSchema]:
     return await topic_controller.get_all_topics()
