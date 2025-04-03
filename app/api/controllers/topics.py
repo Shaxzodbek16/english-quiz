@@ -22,7 +22,7 @@ class TopicController:
         if topic is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Topic with id {topic_id} not found",
+                detail=f"Not found",
             )
         return topic
 
