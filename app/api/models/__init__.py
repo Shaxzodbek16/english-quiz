@@ -6,6 +6,7 @@ from app.api.models.options import Option
 from app.api.models.user_tests import UserTest
 from app.api.models.users import User
 from app.api.models.admins import AdminUsers
+from app.api.models.test_types import TestTypes
 
 __all__ = [
     "Test",
@@ -16,4 +17,5 @@ __all__ = [
     "UserTest",
     "User",
     "AdminUsers",
+    "TestTypes",
 ]
