@@ -7,13 +7,15 @@ from app.core.models.base import Base
 class UserTest(Base):
     __tablename__ = "user_tests"
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    selected_option_id = Column(Integer, ForeignKey("options.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    test_id = Column(Integer, ForeignKey("tests.id", ondelete="CASCADE"), nullable=True)
+    selected_option_id = Column(
+        Integer, ForeignKey("options.id", ondelete="SET NULL"), nullable=True
+    )
     is_correct = Column(Boolean, nullable=False)
 
-    user = relationship("User", back_populates="user_tests")
-    test = relationship("Test", back_populates="user_tests")
+    user = relationship("User", back_populates="user_tests", cascade="all, delete")
+    test = relationship("Test", back_populates="user_tests", cascade="all, delete")
 
     def __repr__(self):
         return f"<UserTest {self.user_id} - {self.test_id}>"

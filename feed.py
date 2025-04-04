@@ -1,12 +1,11 @@
 import asyncio
 import random
-from datetime import datetime
 
 from faker import Faker
+from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import create_engine
 
-from app.api.utils.enums import TestTypeEnum
 from app.core.databases.postgres import get_general_session
 from app.api.models.users import User
 from app.api.models.levels import Level
@@ -16,6 +15,7 @@ from app.api.models.user_statistics import UserStatistic
 from app.api.models.options import Option
 from app.api.models.user_tests import UserTest
 from app.api.models.admins import AdminUsers
+from app.api.models.test_types import TestTypes
 from app.core.models.base import Base
 from app.core.settings import Settings, get_settings
 
@@ -82,20 +82,35 @@ class Feed:
         await self.__session.commit()
         return count
 
-    async def _feed_test_model(
-        self, *, count: int, level_id: int, topic_id: int
-    ) -> int:
+    async def _feed_type_model(self, count: int) -> int:
         for _ in range(count):
+            test_type = TestTypes(
+                name=self.__faker.text(max_nb_chars=20),
+                description=self.__faker.sentence(nb_words=200),
+            )
+            self.__session.add(test_type)
+        await self.__session.commit()
+        return count
+
+    async def _feed_test_model(
+        self, *, count: int, level_id: int, topic_id: int, type_id: int, option_ids: int
+    ) -> int:
+
+        for _ in range(count):
+            options_id = [
+                i for i in range(1, self.__faker.random_int(min=2, max=option_ids))
+            ]
             test = Test(
                 level_id=self.__faker.random_int(min=1, max=level_id),
                 topic_id=self.__faker.random_int(min=1, max=topic_id),
+                type_id=self.__faker.random_int(min=1, max=type_id),
                 question=self.__faker.sentence(),
                 image=self.__faker.image_url(),
-                type=random.choice(
-                    [TestTypeEnum.MULTIPLE_CHOICE, TestTypeEnum.GAP_FILLING]
-                ),
+                answer_explanation=self.__faker.sentence(nb_words=300),
+                option_ids=options_id,
             )
             self.__session.add(test)
+            await self.__session.commit()
         await self.__session.commit()
         return count
 
@@ -115,11 +130,10 @@ class Feed:
         await self.__session.commit()
         return count
 
-    async def _feed_option_model(self, *, count: int, test_id: int) -> int:
+    async def _feed_option_model(self, *, count: int) -> int:
         for _ in range(count):
             option = Option(
-                test_id=self.__faker.random_int(min=1, max=test_id),
-                option_text=self.__faker.sentence(),
+                option=self.__faker.sentence(nb_words=50),
                 is_correct=self.__faker.boolean(chance_of_getting_true=33),
             )
             self.__session.add(option)
@@ -142,20 +156,34 @@ class Feed:
         return count
 
     async def run(self):
+        started = datetime.now()
         await self.__drop_all_tables()
-        max_users = await self._feed_user_model(100)
-        max_levels = await self._feed_level_model(20)
-        max_topics = await self._feed_topic_model(20)
+        max_users = await self._feed_user_model(10_000)
+        max_levels = await self._feed_level_model(200)
+        max_topics = await self._feed_topic_model(200)
+        max_test_types = await self._feed_type_model(200)
+        max_options = await self._feed_option_model(count=10_000)
+
         max_tests = await self._feed_test_model(
-            count=100, level_id=max_levels, topic_id=max_topics
+            count=10_000,
+            level_id=max_levels,
+            topic_id=max_topics,
+            type_id=max_test_types,
+            option_ids=max_options,
         )
-        max_options = await self._feed_option_model(count=100, test_id=max_tests)
         await self._feed_user_tests_model(
-            count=100, user_id=max_users, test_id=max_tests, option_id=max_options
+            count=1_000,
+            user_id=max_users,
+            test_id=max_tests,
+            option_id=max_options,
         )
         await self._feed_user_statistics_model(
-            count=30, user_id=max_users, level_id=max_levels, topic_id=max_topics
+            count=1_000,
+            user_id=max_users,
+            level_id=max_levels,
+            topic_id=max_topics,
         )
+        print(f"Duration: {datetime.now() - started}")
         print("\nSuccessfully fed the data to the models\n")
 
 
@@ -163,6 +191,7 @@ async def main():
     async for session in get_general_session():
         feed = Feed(session)
         await feed.run()
+        break
 
 
 if __name__ == "__main__":

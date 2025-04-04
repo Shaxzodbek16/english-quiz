@@ -1,20 +1,29 @@
-from sqlalchemy import Column, ForeignKey, Boolean, Text, Integer
-from sqlalchemy.orm import relationship
-
+from sqlalchemy import Column, Boolean, Text
+from datetime import datetime, UTC
 from app.core.models.base import Base
 
 
 class Option(Base):
     __tablename__ = "options"
 
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    option_text = Column(Text, nullable=False)
+    option = Column(Text, nullable=False)
     is_correct = Column(Boolean, default=False)
 
-    test = relationship("Test", back_populates="options")
-
     def __repr__(self):
-        return f"<Option {self.option_text}>"
+        return f"<Option {self.option}>"
 
     def to_dict(self):
-        return {"option_text": self.option_text, "is_correct": self.is_correct}
+        return {
+            "id": self.id,
+            "option_text": self.option,
+            "is_correct": self.is_correct,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
+
+    def update(self, data: dict) -> "Option":
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        setattr(self, "updated_at", datetime.now(UTC))
+        return self

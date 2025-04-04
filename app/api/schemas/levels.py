@@ -14,12 +14,11 @@ class CreateLevelSchema(BaseLevel):
 
 
 class UpdateLevelSchema(BaseLevel):
-    created_at: datetime | None
-    updated_at: datetime | None
-
     model_config = ConfigDict(from_attributes=True)
 
 
 class ResponseLevelSchema(UpdateLevelSchema):
     id: int
+    created_at: datetime | None
+    updated_at: datetime | None
     model_config = ConfigDict(from_attributes=True)

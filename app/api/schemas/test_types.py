@@ -1,23 +1,25 @@
-from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
+from pydantic import BaseModel, ConfigDict
 
 
-class OptionsBaseSchema(BaseModel):
-    option: str
-    is_correct: bool
+class TestTypeBaseSchema(BaseModel):
+    name: str
+    description: str | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
-class OptionsCreateSchema(OptionsBaseSchema):
+class TestTypeCreateSchema(TestTypeBaseSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-class OptionsUpdateSchema(OptionsBaseSchema):
+class TestTypeUpdateSchema(TestTypeBaseSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-class OptionsResponseSchema(OptionsBaseSchema):
+class TestTypeResponseSchema(TestTypeBaseSchema):
     id: int
     created_at: datetime
     updated_at: datetime
+
     model_config = ConfigDict(from_attributes=True)
