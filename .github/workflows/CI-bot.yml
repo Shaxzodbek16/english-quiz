@@ -51,9 +51,6 @@ jobs:
         run: |
           alembic revision --autogenerate -m "CI migration"
           alembic upgrade head
-      - name: Feed the database
-        run: |
-          python feed.py
       - name: Run Tests
         run: |
           pytest -m bot
