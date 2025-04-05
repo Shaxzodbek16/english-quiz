@@ -1,0 +1,31 @@
+[Unit]
+Description=English Quiz BBot
+After=network.target
+Wants=network-online.target
+
+[Service]
+User=user
+Group=group
+Type=simple
+WorkingDirectory=/path/to/bot/directory
+ExecStart=/path/to/bot/directory/venv/bin/python -m bot
+Restart=on-failure
+RestartSec=5s
+
+# Resource limits
+CPUQuota=50%
+MemoryMax=512M
+TasksMax=100
+
+# Security enhancements
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
