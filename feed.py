@@ -4,6 +4,7 @@ import random
 from faker import Faker
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import create_engine
 
 from app.core.databases.postgres import get_general_session
@@ -16,7 +17,7 @@ from app.api.models.options import Option
 from app.api.models.user_tests import UserTest
 from app.api.models.admins import AdminUsers
 from app.api.models.test_types import TestTypes
-from app.core.models.base import Base
+from app.api.models.channels import Channel
 from app.core.settings import Settings, get_settings
 
 settings: Settings = get_settings()
@@ -29,12 +30,6 @@ class Feed:
         self.__session = session
         self.__faker = Faker()
 
-    async def __drop_all_tables(self) -> None:  # noqa
-        Base.metadata.drop_all(bind=engine)
-        await asyncio.sleep(3)
-        Base.metadata.create_all(bind=engine)
-        await asyncio.sleep(3)
-
     async def _feed_admin_model(self, count: int) -> int:
         for _ in range(count):
             admin_user = AdminUsers(
@@ -46,6 +41,17 @@ class Feed:
                 is_superuser=self.__faker.boolean(chance_of_getting_true=0),
             )
             self.__session.add(admin_user)
+        await self.__session.commit()
+        return count
+
+    async def _feed_channel_model(self, count: int) -> int:
+        for _ in range(count):
+            channel = Channel(
+                name=self.__faker.text(max_nb_chars=20),
+                link=self.__faker.url(),
+                channel_id=self.__faker.random_int(min=10**10, max=10**12),
+            )
+            self.__session.add(channel)
         await self.__session.commit()
         return count
 
@@ -92,27 +98,44 @@ class Feed:
         await self.__session.commit()
         return count
 
-    async def _feed_test_model(
-        self, *, count: int, level_id: int, topic_id: int, type_id: int, option_ids: int
-    ) -> int:
+    def get_random_options(self, max_options: int) -> list[int]:
+        options_id: list[int] = []
+        options_id.clear()
+        for i in range(1, self.__faker.random_int(min=2, max=10)):
+            options_id.append(random.randint(1, max_options))
+        return options_id
 
-        for _ in range(count):
-            options_id = [
-                i for i in range(1, self.__faker.random_int(min=2, max=option_ids))
-            ]
-            test = Test(
-                level_id=self.__faker.random_int(min=1, max=level_id),
-                topic_id=self.__faker.random_int(min=1, max=topic_id),
-                type_id=self.__faker.random_int(min=1, max=type_id),
-                question=self.__faker.sentence(),
-                image=self.__faker.image_url(),
-                answer_explanation=self.__faker.sentence(nb_words=300),
-                option_ids=options_id,
-            )
-            self.__session.add(test)
+    async def _feed_test_model(
+        self,
+        *,
+        count: int,
+        level_id: int,
+        topic_id: int,
+        type_id: int,
+        options_id: int,
+        chunk_size: int = 1_000_000,
+    ) -> int:
+        inserted = 0
+        while inserted < count:
+            batch = []
+            for _ in range(min(chunk_size, count - inserted)):
+                batch.append(
+                    {
+                        "level_id": self.__faker.random_int(min=1, max=level_id),
+                        "topic_id": self.__faker.random_int(min=1, max=topic_id),
+                        "type_id": self.__faker.random_int(min=1, max=type_id),
+                        "question": self.__faker.sentence(),
+                        "image": self.__faker.image_url(),
+                        "answer_explanation": self.__faker.sentence(nb_words=20),
+                        "option_ids": self.get_random_options(options_id),
+                    }
+                )
+
+            await self.__session.execute(insert(Test), batch)
             await self.__session.commit()
-        await self.__session.commit()
-        return count
+            inserted += len(batch)
+            print(f"Inserted Tests: {inserted:,}/{count:,}")
+        return inserted
 
     async def _feed_user_statistics_model(
         self, *, count: int, user_id: int, level_id: int, topic_id: int
@@ -130,14 +153,20 @@ class Feed:
         await self.__session.commit()
         return count
 
-    async def _feed_option_model(self, *, count: int) -> int:
-        for _ in range(count):
-            option = Option(
-                option=self.__faker.sentence(nb_words=50),
-                is_correct=self.__faker.boolean(chance_of_getting_true=33),
-            )
-            self.__session.add(option)
-        await self.__session.commit()
+    async def _feed_option_model(self, *, count: int, chunk_size: int = 500_000) -> int:
+        inserted = 0
+        while inserted < count:
+            batch = [
+                {
+                    "option": self.__faker.sentence(nb_words=15),
+                    "is_correct": self.__faker.boolean(chance_of_getting_true=50),
+                }
+                for _ in range(min(chunk_size, count - inserted))
+            ]
+            await self.__session.execute(insert(Option), batch)
+            await self.__session.commit()
+            inserted += len(batch)
+            print(f"Inserted: {inserted:,}/{count:,}")
         return count
 
     async def _feed_user_tests_model(
@@ -157,28 +186,28 @@ class Feed:
 
     async def run(self):
         started = datetime.now()
-        await self.__drop_all_tables()
-        max_users = await self._feed_user_model(10_000)
-        max_levels = await self._feed_level_model(200)
-        max_topics = await self._feed_topic_model(200)
-        max_test_types = await self._feed_type_model(200)
-        max_options = await self._feed_option_model(count=10_000)
+        await self._feed_channel_model(100)
+        max_users = await self._feed_user_model(100_000)
+        max_levels = await self._feed_level_model(10)
+        max_topics = await self._feed_topic_model(10)
+        max_test_types = await self._feed_type_model(10)
+        max_options = await self._feed_option_model(count=4_000_000)
 
         max_tests = await self._feed_test_model(
-            count=10_000,
+            count=10_000_000,
             level_id=max_levels,
             topic_id=max_topics,
             type_id=max_test_types,
-            option_ids=max_options,
+            options_id=max_options,
         )
         await self._feed_user_tests_model(
-            count=1_000,
+            count=100_000,
             user_id=max_users,
             test_id=max_tests,
             option_id=max_options,
         )
         await self._feed_user_statistics_model(
-            count=1_000,
+            count=100_000,
             user_id=max_users,
             level_id=max_levels,
             topic_id=max_topics,
@@ -195,4 +224,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"Exception, {e}")

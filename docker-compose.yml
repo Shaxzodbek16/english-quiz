@@ -1,4 +1,9 @@
 services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
   api:
     build:
       context: .
@@ -26,7 +31,6 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - app-network
-
 volumes:
   postgres-data:
 
