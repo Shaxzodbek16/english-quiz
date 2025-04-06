@@ -24,10 +24,26 @@ async def create_user(message: Message) -> tuple[User, bool]:
         first_name=new_user.first_name,
         last_name=new_user.last_name,
         telegram_id=new_user.id,
-        language=new_user.language_code,
+        language=(
+            new_user.language_code
+            if new_user.language_code in ["en", "uz", "ru"]
+            else "en"
+        ),
         is_active=True,
     )
     async with get_session_without_depends() as session:
         session.add(user)
         await session.commit()
+        await session.refresh(user)
     return user, False
+
+
+async def update_user_language(telegram_id: int, language: str) -> None:
+    async with get_session_without_depends() as session:
+        user = await session.execute(
+            select(User).where(User.telegram_id == telegram_id)
+        )
+        user = user.scalar_one_or_none()
+        if user:
+            user.language = language
+            await session.commit()
