@@ -35,7 +35,7 @@ class InlineKeyboard:
                         web_app=WebAppInfo(url="https://translate.google.com"),
                     )
                 ],
-                [InlineKeyboardButton(text="Settings", callback_data="settings")],
+                [InlineKeyboardButton(text="Settings", callback_data="settings_menu")],
             ]
         )
         admin_user = await self._check_is_admin()

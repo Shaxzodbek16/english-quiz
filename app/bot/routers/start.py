@@ -2,40 +2,46 @@ from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
-from app.bot.constants.main import start_text, help_text
 from app.bot.controllers.users import create_user
-from app.bot.keyboards.inlinne.main import InlineKeyboard
+from app.bot.keyboards.inline.main import InlineKeyboard
+from app.core.middlewares.language import I18nMiddleware
 
 router = Router()
 
 
 @router.message(CommandStart())
-async def start_command(message: Message) -> None:
+async def start_command(message: Message, i18n: I18nMiddleware, locale: str) -> None:
     from_user = message.from_user
     if from_user is None:
         return
     button = InlineKeyboard(message=message)
+
     try:
         user, is_old = await create_user(message)
     except Exception as e:
-        await message.answer(
-            "An error occurred while creating your profile. Please try again with /start."
-            + str(e)
-        )
+        error_text = i18n._("error_message", locale, error=str(e))
+        await message.answer(error_text)
         return
+
     if is_old:
-        await message.answer("Welcome back! How can I assist you today?")
+        welcome_back_text = i18n._("welcome_back_message", locale)
+        await message.answer(welcome_back_text)
     else:
-        await message.answer(start_text.format(from_user.first_name))
+        welcome_text = i18n._("welcome_message", locale, name=from_user.first_name)
+        await message.answer(welcome_text)
+
+    start_message = i18n._("start_message", locale)
     await message.answer(
-        "Let’s get started! 🎯Choose an option below:",
+        start_message,
         reply_markup=await button.start_command_reply_markup(),
     )
 
 
 @router.message(Command("help"))
-async def show_help(message: Message):
+async def show_help(message: Message, i18n: I18nMiddleware, locale: str) -> None:
     from_user = message.from_user
     if from_user is None:
         return
-    await message.answer(help_text.format(from_user.first_name))
+
+    help_message = i18n._("help_message", locale, name=from_user.first_name)
+    await message.answer(help_message)
