@@ -7,6 +7,7 @@ from app.api.models.user_tests import UserTest
 from app.api.models.users import User
 from app.api.models.admins import AdminUsers
 from app.api.models.test_types import TestTypes
+from app.api.models.channels import Channel
 
 __all__ = [
     "Test",
@@ -18,4 +19,5 @@ __all__ = [
     "User",
     "AdminUsers",
     "TestTypes",
+    "Channel",
 ]
