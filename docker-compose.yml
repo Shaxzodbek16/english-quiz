@@ -20,7 +20,7 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres-quiz
-    restart: always
+    restart: no
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

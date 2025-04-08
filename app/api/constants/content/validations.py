@@ -10,7 +10,7 @@ validations: dict[str, dict] = {
         "max_size": 1_000 * 1024 * 1024,  # 1000MB
     },
     "document": {
-        "path": "media/uploads/docs",
+        "path": "media/uploads/documents",
         "support": [
             "pdf",
             "doc",
