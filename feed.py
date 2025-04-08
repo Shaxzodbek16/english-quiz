@@ -191,23 +191,23 @@ class Feed:
         max_levels = await self._feed_level_model(10)
         max_topics = await self._feed_topic_model(10)
         max_test_types = await self._feed_type_model(10)
-        max_options = await self._feed_option_model(count=4_000_000)
+        max_options = await self._feed_option_model(count=4_000)
 
         max_tests = await self._feed_test_model(
-            count=10_000_000,
+            count=10_000,
             level_id=max_levels,
             topic_id=max_topics,
             type_id=max_test_types,
             options_id=max_options,
         )
         await self._feed_user_tests_model(
-            count=100_000,
+            count=100,
             user_id=max_users,
             test_id=max_tests,
             option_id=max_options,
         )
         await self._feed_user_statistics_model(
-            count=100_000,
+            count=100,
             user_id=max_users,
             level_id=max_levels,
             topic_id=max_topics,
