@@ -18,13 +18,18 @@ class TestTypesController:
         self.__test_type_repository = test_types_repository
 
     async def get_all_test_types(self) -> Sequence[TestTypeResponseSchema]:
-        return await self.__test_type_repository.get_all_test_types()
+        return [
+            TestTypeResponseSchema.model_validate(
+                test_type
+                for test_type in await self.__test_type_repository.get_all_test_types()
+            )
+        ]
 
     async def get_test_type_by_id(self, test_type: int) -> TestTypeResponseSchema:
         res = await self.__test_type_repository.get_test_type_by_id(test_type)
         if res is None:
             raise HTTPException(status_code=404, detail="test_type not found")
-        return res
+        return TestTypeResponseSchema.model_validate(res)
 
     async def create_test_type(
         self, *, user: AdminUsers | User, test_type: TestTypeCreateSchema
@@ -35,7 +40,9 @@ class TestTypesController:
             raise HTTPException(
                 status_code=400, detail=f"{test_type.name} already exists"
             )
-        return await self.__test_type_repository.create_test_type(test_type)
+        return TestTypeResponseSchema.model_validate(
+            await self.__test_type_repository.create_test_type(test_type)
+        )
 
     async def update_test_type(
         self,
@@ -53,8 +60,8 @@ class TestTypesController:
             raise HTTPException(
                 status_code=400, detail=f"{test_type.name} already exists"
             )
-        return await self.__test_type_repository.update_test_type(
-            test_type_id, test_type
+        return TestTypeResponseSchema.model_validate(
+            await self.__test_type_repository.update_test_type(test_type_id, test_type)
         )
 
     async def delete_test_type(

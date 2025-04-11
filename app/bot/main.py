@@ -24,7 +24,6 @@ async def main() -> None:
     dp.message.middleware(i18n_middleware)
     dp.callback_query.middleware(i18n_middleware)
 
-
     dp.include_router(v1_router)
 
     await dp.start_polling(bot)

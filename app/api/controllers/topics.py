@@ -15,7 +15,10 @@ class TopicController:
         self.__topic_repository = topic_repository
 
     async def get_all_topics(self) -> Sequence[ResponseTopicSchema]:
-        return await self.__topic_repository.get_all_topics()
+        return [
+            ResponseTopicSchema.model_validate(topic)
+            for topic in await self.__topic_repository.get_all_topics()
+        ]
 
     async def get_topic_by_id(self, topic_id: int) -> ResponseTopicSchema:
         topic = await self.__topic_repository.get_topic_by_id(topic_id)
@@ -24,7 +27,7 @@ class TopicController:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Not found",
             )
-        return topic
+        return ResponseTopicSchema.model_validate(topic)
 
     async def create_topic(
         self, topic: CreateTopicSchema, current_user: AdminUsers | User
@@ -39,7 +42,9 @@ class TopicController:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Topic with name {topic.name} already exists",
             )
-        return await self.__topic_repository.create_topic(topic)
+        return ResponseTopicSchema.model_validate(
+            await self.__topic_repository.create_topic(topic)
+        )
 
     async def update_topic(
         self,
@@ -59,7 +64,9 @@ class TopicController:
                 detail=f"Topic with name {topic.name} already exists",
             )
 
-        return await self.__topic_repository.update_topic(topic, topic_id)
+        return ResponseTopicSchema.model_validate(
+            await self.__topic_repository.update_topic(topic, topic_id)
+        )
 
     async def delete_topic(
         self, *, topic_id: int, current_user: AdminUsers | User
