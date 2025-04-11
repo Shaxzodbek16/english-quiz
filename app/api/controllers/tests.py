@@ -49,25 +49,4 @@ class TestsController:
             level_id=level_id, topic_id=topic_id, type_id=type_id, page=page, size=size
         )
         result: list[TestResponseSchema] = []
-        for test in tests:
-            result.append(
-                TestResponseSchema(
-                    id=test.id,
-                    question=test.question,
-                    image=test.image,
-                    answer_explanation=test.answer_explanation,
-                    options=[
-                        OptionsResponseSchema.model_validate(
-                            (
-                                await self.__options_repository.get_option_by_id(
-                                    option_id
-                                )
-                            )
-                        )
-                        for option_id in test.option_ids
-                    ],
-                    created_at=test.created_at,
-                    updated_at=test.updated_at,
-                )
-            )
         return result

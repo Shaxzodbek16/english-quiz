@@ -26,8 +26,6 @@ async def settings_command(message: Message, i18n: I18nMiddleware, locale: str) 
     await message.reply(settings_text, reply_markup=get_settings_menu())
 
 
-
-
 @router.callback_query(F.data == "settings_menu")
 async def settings_menu_callback(
     callback: CallbackQuery, i18n: I18nMiddleware, locale: str

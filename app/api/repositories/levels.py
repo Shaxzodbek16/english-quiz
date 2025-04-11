@@ -5,7 +5,6 @@ from sqlalchemy.future import select
 from fastapi import Depends
 
 from app.api.schemas.levels import (
-    ResponseLevelSchema,
     CreateLevelSchema,
     UpdateLevelSchema,
 )
@@ -19,39 +18,35 @@ class LevelRepository:
 
     async def get_all_levels(
         self,
-    ) -> Sequence[ResponseLevelSchema]:
+    ) -> Sequence[Level]:
         result = await self.__session.execute(select(Level))
-        levels = result.scalars().all()
-        return [ResponseLevelSchema.model_validate(level) for level in levels]
+        return result.scalars().all()
 
-    async def get_level_by_id(self, level_id: int) -> ResponseLevelSchema | None:
+    async def get_level_by_id(self, level_id: int) -> Level | None:
         result = await self.__session.execute(select(Level).where(Level.id == level_id))
-        level = result.scalar_one_or_none()
-        if level is None:
-            return None
-        return ResponseLevelSchema.model_validate(level)
+        return result.scalar_one_or_none()
 
     async def get_level_by_name(self, name: str) -> int:
         result = await self.__session.execute(select(Level).where(Level.name == name))
         levels = result.scalars().all()
         return len(levels)
 
-    async def create_level(self, level: CreateLevelSchema) -> ResponseLevelSchema:
+    async def create_level(self, level: CreateLevelSchema) -> Level:
         new_level = Level(**level.model_dump())
         self.__session.add(new_level)
         await self.__session.commit()
         await self.__session.refresh(new_level)
-        return ResponseLevelSchema.model_validate(new_level)
+        return new_level
 
     async def update_level(
         self, level: UpdateLevelSchema, level_id: int
-    ) -> ResponseLevelSchema:
+    ) -> Level | None:
         result = await self.__session.execute(select(Level).where(Level.id == level_id))
         existing_level = result.scalars().first()
         new_level = existing_level.update(level.model_dump())  # type: ignore
         await self.__session.commit()
         await self.__session.refresh(new_level)
-        return ResponseLevelSchema.model_validate(existing_level)
+        return existing_level
 
     async def delete_level(self, level_id: int) -> None:
         result = await self.__session.execute(select(Level).where(Level.id == level_id))

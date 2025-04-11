@@ -38,9 +38,7 @@ class I18nMiddleware:
         translations = self.translations.get(
             locale, self.translations[DEFAULT_LANGUAGE]
         )
-        message = translations.get(
-            key, key
-        )
+        message = translations.get(key, key)
         return message.format(**kwargs)
 
     async def __call__(self, handler, event, data):
