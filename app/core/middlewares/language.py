@@ -1,5 +1,5 @@
 from aiogram.types import TelegramObject, User
-from typing import Any, Dict, Optional
+from typing import Any
 import importlib
 
 
@@ -7,7 +7,7 @@ DEFAULT_LANGUAGE = "en"
 SUPPORTED_LANGUAGES = ["en", "uz", "ru"]
 
 
-def load_translations(lang: str) -> Dict[str, str]:
+def load_translations(lang: str) -> dict[str, str]:
     try:
         module = importlib.import_module(f"app.core.locales.{lang}")
         return module.translations
@@ -18,12 +18,12 @@ def load_translations(lang: str) -> Dict[str, str]:
 
 class I18nMiddleware:
     def __init__(self):
-        self.translations: Dict[str, Dict[str, str]] = {}
+        self.translations: dict[str, dict[str, str]] = {}
         for lang in SUPPORTED_LANGUAGES:
             self.translations[lang] = load_translations(lang)
 
-    async def get_locale(self, event: TelegramObject, data: Dict[str, Any]) -> str:
-        user: Optional[User] = data.get("event_from_user")
+    async def get_locale(self, event: TelegramObject, data: dict[str, Any]) -> str:
+        user: User | None = data.get("event_from_user")
         if not user:
             return DEFAULT_LANGUAGE
 

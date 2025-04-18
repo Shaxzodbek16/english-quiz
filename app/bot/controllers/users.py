@@ -40,10 +40,10 @@ async def create_user(message: Message) -> tuple[User, bool]:
 
 async def update_user_language(telegram_id: int, language: str) -> None:
     async with get_session_without_depends() as session:
-        user = await session.execute(
+        result = await session.execute(
             select(User).where(User.telegram_id == telegram_id)
         )
-        user = user.scalar_one_or_none()
+        user = result.scalar_one_or_none()
         if user:
             user.language = language
             await session.commit()
