@@ -1,26 +1,13 @@
 services:
   redis:
     image: redis:latest
-    container_name: redis
+    container_name: redis-english-quiz
     ports:
       - "6379:6379"
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
-    volumes:
-      - .:/app
-    networks:
-      - app-network
-
   postgres:
     image: postgres:latest
-    container_name: postgres-quiz
-    restart: no
+    container_name: postgres-english-quiz
+    restart: on-failure
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -31,6 +18,43 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - app-network
+  rabbitmq:
+    container_name: rabbitmq-english-quiz
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    working_dir: /app
+    networks:
+      - app-network
+
 volumes:
   postgres-data:
 
