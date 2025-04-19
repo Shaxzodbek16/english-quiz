@@ -44,13 +44,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt --no-cache-dir
       - name: Create .env file from example
+        working-directory: ./backend
         run: |
           cp .env.example .env
           sleep 3
       - name: Run migrations
+        working-directory: ./backend
         run: |
           alembic revision --autogenerate -m "CI migration"
           alembic upgrade head
       - name: Run Tests
+        working-directory: ./backend
         run: |
           pytest -m bot

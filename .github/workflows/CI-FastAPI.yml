@@ -44,10 +44,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt --no-cache-dir
       - name: Run migrations
-
+        working-directory: ./backend
         run: |
           alembic revision --autogenerate -m "CI migration"
           alembic upgrade head
       - name: Run Tests
+        working-directory: ./backend
         run: |
           pytest -m backend
