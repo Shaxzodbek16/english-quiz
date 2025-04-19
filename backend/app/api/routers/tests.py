@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, HTTPException, status, Query
+from fastapi import Depends, APIRouter, status, Query
 from typing import Sequence
 
 from app.api.controllers.tests import TestsController

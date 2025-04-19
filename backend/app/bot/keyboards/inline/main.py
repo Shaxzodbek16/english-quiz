@@ -28,7 +28,14 @@ class InlineKeyboard:
     async def start_command_reply_markup(self):
         button = InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text="EnglishTest", callback_data="test")],
+                [
+                    InlineKeyboardButton(
+                        text="EnglishTest",
+                        web_app=WebAppInfo(
+                            url="https://e6db-193-104-179-125.ngrok-free.app"
+                        ),
+                    ),
+                ],
                 [
                     InlineKeyboardButton(
                         text="Google translate",
