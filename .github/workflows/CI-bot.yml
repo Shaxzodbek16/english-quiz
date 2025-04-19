@@ -51,7 +51,6 @@ jobs:
       - name: Run migrations
         working-directory: ./backend
         run: |
-          alembic revision --autogenerate -m "CI migration"
           alembic upgrade head
       - name: Run Tests
         working-directory: ./backend
