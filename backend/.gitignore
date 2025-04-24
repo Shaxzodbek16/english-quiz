@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .DS_Store
+app/core/migrations/versions/*.py
 # C extensions
 *.so
 .idea
