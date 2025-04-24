@@ -45,8 +45,7 @@ class APITracker:
         await self.__apply_decay(key, last_decay_key)
         current_calls = await self.__increment_api_call_count(key)
         if current_calls == 1:
-            await self.__redis_client.expire(key, 60
-            )
+            await self.__redis_client.expire(key, 60)
             await self.__redis_client.expire(last_decay_key, 60)
         if current_calls > self.rate_limit:
             excess_calls = current_calls - self.rate_limit

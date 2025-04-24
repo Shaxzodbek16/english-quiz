@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     API_TRAFFIC_DB: int = 0
     CACHE_DB: int = 1
+    WORKERS_DB: int = 2
 
     # WebApp
     BOT_TOKEN: str = "token"

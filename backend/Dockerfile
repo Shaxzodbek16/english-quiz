@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -17,9 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+RUN chmod +x run.sh bot.sh
+
 EXPOSE 8000
 
-RUN chmod +x run.sh
-RUN chmod +x bot.sh
-
-CMD ["sh", "-c", "./run.sh & ./bot.sh & wait"]
+CMD ["sh", "-c", "./run.sh & ./bot.sh & celery -A app.tasks.celery_worker worker --loglevel=info & wait"]

@@ -1,16 +1,15 @@
 services:
   redis:
-    image: redis:7
+    image: redis:7-alpine
     container_name: redis-english-quiz
-    environment:
-      - REDIS_PASSWORD=redis
-      - REDIS_USERNAME=redis
     ports:
       - "6379:6379"
     networks:
       - app-network
+
+
   postgres:
-    image: postgres:17-alpine
+    image: postgres:17.4
     container_name: postgres-english-quiz
     restart: on-failure
     environment:
@@ -23,12 +22,18 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - app-network
+
+
   rabbitmq:
     container_name: rabbitmq-english-quiz
-    image: rabbitmq:3-management
+    image: rabbitmq:3.12-management
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - app-network
+
+
   backend:
     build:
       context: ./backend
@@ -38,25 +43,31 @@ services:
     depends_on:
       - postgres
       - redis
+      - rabbitmq
     volumes:
       - ./backend:/app
     working_dir: /app
+    command: >
+      sh -c "./run.sh & ./bot.sh & celery -A app.tasks.celery_worker worker --loglevel=info & wait"
     networks:
       - app-network
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    working_dir: /app
-    networks:
-      - app-network
+
+
+
+#  frontend:
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#    ports:
+#      - "3000:3000"
+#    depends_on:
+#      - backend
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules
+#    working_dir: /app
+#    networks:
+#      - app-network
 
 volumes:
   postgres-data:
