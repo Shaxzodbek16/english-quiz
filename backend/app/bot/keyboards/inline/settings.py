@@ -6,12 +6,13 @@ def get_settings_menu() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Language", callback_data="settings_language"
+                    text="🌍 Languages", callback_data="settings_language"
                 ),
                 InlineKeyboardButton(
-                    text="Notification", callback_data="settings_notification"
+                    text="🔔 Notifications", callback_data="settings_notification"
                 ),
-            ]
+            ],
+            [InlineKeyboardButton(text="🔙 Back", callback_data="back_to_main")],
         ]
     )
     return keyboard

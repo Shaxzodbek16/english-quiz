@@ -23,6 +23,6 @@ translations = {
 🚀 Improve your English with us! 🔥
     """,
     "settings_message": "Please select your language:",
-    "language_set": "Language set to {lang}!",
+    "language_set": "Language set up to {lang}!",
     "error_message": "An error occurred while creating your profile. Please try again with /start. Error: {error}",
 }
