@@ -1,8 +1,13 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
-from app.bot.controllers.users import get_user_by_telegram_id, update_user_language
+from app.bot.controllers.users import (
+    get_user_by_telegram_id,
+    update_user_language,
+)
 from app.bot.keyboards.inline.language import get_language_keyboard
 from app.bot.keyboards.inline.settings import get_settings_menu
+from app.bot.keyboards.inline.dictionary import get_dictionaries_menu
+from app.bot.routers.start import start_command
 from app.core.middlewares.language import I18nMiddleware
 
 router = Router()
@@ -40,6 +45,19 @@ async def settings_menu_callback(
     await callback.answer()
 
 
+@router.callback_query(F.data == "dictionaries_menu")
+async def dictionaries_menu_callback(
+    callback: CallbackQuery, i18n: I18nMiddleware, locale: str
+) -> None:
+    if callback.message is None:
+        return
+    dictionaries_text = i18n._("🔘 Options", locale)
+    await callback.message.reply(
+        dictionaries_text, reply_markup=get_dictionaries_menu()
+    )
+    await callback.answer()
+
+
 @router.callback_query(F.data == "settings_language")
 async def settings_language_callback(
     callback: CallbackQuery, i18n: I18nMiddleware, locale: str
@@ -73,4 +91,12 @@ async def process_language_selection(
     confirmation_text = i18n._("language_set", locale, lang=lang.capitalize())
 
     await callback.message.reply(confirmation_text)  # type: ignore
+    await callback.answer()
+
+
+@router.callback_query(F.data == "back_to_main")
+async def handle_back_to_main(
+    callback: CallbackQuery, i18n: I18nMiddleware, locale: str
+):
+    await start_command(callback.message, i18n, locale)
     await callback.answer()

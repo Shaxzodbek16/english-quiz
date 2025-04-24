@@ -31,7 +31,7 @@ class InlineKeyboard:
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
-                        text="EnglishTest",
+                        text="🧪 EnglishTest ",
                         web_app=WebAppInfo(
                             url=f"https://shaxzodbek-muxtorov.jprq.site/?user={hash_telegram_id(self.__tg_user.id)}"
                         ),
@@ -39,11 +39,14 @@ class InlineKeyboard:
                 ],
                 [
                     InlineKeyboardButton(
-                        text="Google translate",
-                        web_app=WebAppInfo(url="https://translate.google.com"),
+                        text="📚 Dictionaries", callback_data="dictionaries_menu"
                     )
                 ],
-                [InlineKeyboardButton(text="Settings", callback_data="settings_menu")],
+                [
+                    InlineKeyboardButton(
+                        text="⚙️ Settings", callback_data="settings_menu"
+                    )
+                ],
             ]
         )
         admin_user = await self._check_is_admin()
@@ -53,7 +56,7 @@ class InlineKeyboard:
             button.inline_keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text="Admin Panel Superuser",
+                        text="🔒 Superuser Panel ",
                         url="https://translate.google.com",
                     )
                 ],
@@ -63,7 +66,7 @@ class InlineKeyboard:
             button.inline_keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text="Admin Panel",
+                        text="🧑‍💻 Admin Panel",
                         url="https://translate.google.com",
                     )
                 ],
