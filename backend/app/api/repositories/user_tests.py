@@ -23,14 +23,23 @@ class UserTestRepository:
         await self.__session.refresh(user_test)
         return user_test
 
-    async def get_user_test_by_id(self, *, user_test_id: int) -> UserTest | None:
+    async def get_user_test_by_id(
+        self, *, user_test_id: int, user_id: int
+    ) -> UserTest | None:
         user_test = await self.__session.execute(
-            select(UserTest).where(UserTest.id == user_test_id)
+            select(UserTest)
+            .where(UserTest.id == user_test_id)
+            .where(UserTest.user_id == user_id)
         )
         return user_test.scalars().first()
 
-    async def get_all_user_tests(self, *, page: int, size: int) -> Sequence[UserTest]:
+    async def get_all_user_tests(
+        self, *, user_id: int, page: int, size: int
+    ) -> Sequence[UserTest]:
         user_tests = await self.__session.execute(
-            select(UserTest).offset(page * size).limit(size)
+            select(UserTest)
+            .where(UserTest.user_id == user_id)
+            .offset(page * size)
+            .limit(size)
         )
         return user_tests.scalars().all()

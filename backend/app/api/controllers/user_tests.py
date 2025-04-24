@@ -51,7 +51,7 @@ class UserTestController:
             correct_option_id=data.correct_option_id,
         )
 
-        res = self.__user_test_repository.create_user_test(
+        res = await self.__user_test_repository.create_user_test(
             data=data, user_id=user.get_id()
         )
 
@@ -60,10 +60,10 @@ class UserTestController:
     async def get_user_test_by_id(
         self, *, user_test_id: int, user: User | AdminUsers
     ) -> UserTestResponseSchema:
-        if not self.__user_repository.get_user_by_id(user.get_id()):
+        if not await self.__user_repository.get_user_by_id(user.get_id()):
             raise HTTPException(status_code=404, detail="User not found")
         res = await self.__user_test_repository.get_user_test_by_id(
-            user_test_id=user_test_id
+            user_test_id=user_test_id, user_id=user.get_id()
         )
         if not res:
             raise HTTPException(status_code=404, detail="User test not found")
@@ -72,7 +72,9 @@ class UserTestController:
     async def get_all_user_tests(
         self, *, page: int, size: int, user: User | AdminUsers
     ) -> list[UserTestResponseSchema]:
-        if not self.__user_repository.get_user_by_id(user.get_id()):
+        if not await self.__user_repository.get_user_by_id(user.get_id()):
             raise HTTPException(status_code=404, detail="User not found")
-        res = await self.__user_test_repository.get_all_user_tests(page=page, size=size)
+        res = await self.__user_test_repository.get_all_user_tests(
+            user_id=user.get_id(), page=page, size=size
+        )
         return [UserTestResponseSchema.model_validate(r) for r in res]

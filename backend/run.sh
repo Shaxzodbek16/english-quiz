@@ -1,6 +1,11 @@
 #!/bin/bash
 
+# shellcheck disable=SC2155
 export PYTHONPATH=$(pwd)/app
+
+alembic revision --autogenerate -m "Initial migration"
+
+sleep 5
 
 alembic upgrade head
 

@@ -1,6 +1,7 @@
 from typing import Sequence
 from fastapi import Depends, HTTPException, status
 
+from app.api.repositories.api_tracker import APITracker
 from app.api.repositories.levels import LevelRepository
 from app.api.repositories.options import OptionsRepository
 from app.api.repositories.test_types import TestTypesRepository
@@ -19,12 +20,14 @@ class TestsController:
         topic_repository: TopicRepository = Depends(),
         test_types_repository: TestTypesRepository = Depends(),
         options_repository: OptionsRepository = Depends(),
+        api_traffic_repository: APITracker = Depends(),
     ) -> None:
         self.__test_repository: TestsRepository = test_repository
         self.__level_repository: LevelRepository = level_repository
         self.__topic_repository: TopicRepository = topic_repository
         self.__test_types_repository: TestTypesRepository = test_types_repository
         self.__options_repository: OptionsRepository = options_repository
+        self.__api_traffic_repository: APITracker = api_traffic_repository
 
     async def __is_valid(self, *, level_id: int, topic_id: int, type_id: int) -> None:
         level = await self.__level_repository.get_level_by_id(level_id)
@@ -44,8 +47,16 @@ class TestsController:
             )
 
     async def get_all_tests(
-        self, *, level_id: int, topic_id: int, type_id: int, page: int, size: int
+        self,
+        *,
+        level_id: int,
+        topic_id: int,
+        type_id: int,
+        page: int,
+        size: int,
+        current_user: AdminUsers | User
     ) -> list[TestResponseSchema]:
+        await self.__api_traffic_repository.check_user_api_calls(current_user)
         await self.__is_valid(level_id=level_id, topic_id=topic_id, type_id=type_id)
         tests: Sequence[Test] = await self.__test_repository.get_all_tests(
             level_id=level_id, topic_id=topic_id, type_id=type_id, page=page, size=size
@@ -65,7 +76,10 @@ class TestsController:
             )
         return result
 
-    async def get_test_by_id(self, test_id: int) -> TestResponseSchema:
+    async def get_test_by_id(
+        self, test_id: int, current_user: AdminUsers | User
+    ) -> TestResponseSchema:
+        await self.__api_traffic_repository.check_user_api_calls(current_user)
         res: Test | None = await self.__test_repository.get_test_by_id(test_id)
         if res is None:
             raise HTTPException(

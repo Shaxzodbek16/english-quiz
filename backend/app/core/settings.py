@@ -3,7 +3,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-
     # API
     API_V1_STR: str = "/api/v1"
     BASE_URL: str = "http://localhost:8000/"
@@ -20,6 +19,12 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = "127.0.0.1"
     POSTGRES_PORT: str = "5432"
     POSTGRES_DATABASE: str = "postgres"
+
+    # REDIS CREDENTIALS
+    REDIS_HOST: str = "redis"
+    REDIS_PORT: int = 6379
+    API_TRAFFIC_DB: int = 0
+    CACHE_DB: int = 1
 
     # WebApp
     BOT_TOKEN: str = "token"

@@ -1,11 +1,12 @@
+from zoneinfo import ZoneInfo
+
 from passlib.context import CryptContext
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi import Form
 
 from app.api.models.admins import AdminUsers
 from app.api.models.users import User
@@ -27,14 +28,27 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
+UTC = ZoneInfo("UTC")
+
+
 class JWTHandler:
     def __init__(self, _settings: Settings) -> None:
         self.__settings = _settings
 
+    def __sanitize_payload(self, data: dict) -> dict:
+        """Convert all datetime values to ISO format strings, and remove unserializable types."""
+        sanitized = {}
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                sanitized[key] = value.isoformat()
+            else:
+                sanitized[key] = value
+        return sanitized
+
     def create_token(self, data: dict, expires_delta: timedelta) -> str:
-        to_encode = data.copy()
         expire = datetime.now(UTC) + expires_delta
-        to_encode.update({"exp": expire})
+        to_encode = self.__sanitize_payload(data)
+        to_encode["exp"] = int(expire.timestamp())  # Use int for JWT compatibility
         return jwt.encode(
             to_encode, self.__settings.SECRET_KEY, algorithm=self.__settings.ALGORITHM
         )
@@ -59,35 +73,38 @@ class JWTHandler:
     async def __find_user(
         self, payload: dict, session: AsyncSession
     ) -> AdminUsers | User:
-        email = payload.get("email", None)
-        telegram_id = payload.get("telegram_id", None)
+        email = payload.get("email")
+        telegram_id = payload.get("telegram_id")
+
         if telegram_id in self.__settings.get_superusers:
             res = await session.execute(
                 select(AdminUsers).where(AdminUsers.telegram_id == telegram_id)
             )
             user = res.scalar_one_or_none()
-            if user is not None:
+            if user:
                 return user
-        if telegram_id is not None:
+
+        if telegram_id:
             res = await session.execute(
                 select(AdminUsers).where(AdminUsers.telegram_id == telegram_id)
             )
             user = res.scalar_one_or_none()
-            if user is not None:
+            if user:
                 return user
 
             res = await session.execute(
                 select(User).where(User.telegram_id == telegram_id)
             )
             user = res.scalar_one_or_none()
-            if user is not None:
+            if user:
                 return user
-        if email is not None:
+
+        if email:
             res = await session.execute(
                 select(AdminUsers).where(AdminUsers.email == email)
             )
             user = res.scalar_one_or_none()
-            if user is not None:
+            if user:
                 return user
 
         raise HTTPException(

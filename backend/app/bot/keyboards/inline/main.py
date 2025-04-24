@@ -3,24 +3,25 @@ from aiogram.types import (
     InlineKeyboardButton,
     WebAppInfo,
     Message,
+    User,
 )
 
 from app.api.models import AdminUsers
-from app.bot.controllers.admins import get_user_by_telegram_id
+from app.bot.controllers.admins import get_admin_by_telegram_id
 from app.core.settings import get_settings, Settings
+from app.api.utils.security import hash_telegram_id
 
 settings: Settings = get_settings()
 
 
 class InlineKeyboard:
     def __init__(self, *, message: Message) -> None:
-        self.__message: Message = message
+        if message.from_user is None:
+            raise ValueError("from_user is None")
+        self.__tg_user: User = message.from_user
 
     async def _check_is_admin(self) -> AdminUsers | None:
-        from_user = self.__message.from_user
-        if from_user is None:
-            raise ValueError("User not found in the message")
-        admin_user = await get_user_by_telegram_id(from_user.id)
+        admin_user = await get_admin_by_telegram_id(self.__tg_user.id)
         if admin_user is not None:
             return admin_user
         return None
@@ -32,7 +33,7 @@ class InlineKeyboard:
                     InlineKeyboardButton(
                         text="EnglishTest",
                         web_app=WebAppInfo(
-                            url="https://e6db-193-104-179-125.ngrok-free.app"
+                            url=f"https://shaxzodbek-muxtorov.jprq.site/?user={hash_telegram_id(self.__tg_user.id)}"
                         ),
                     ),
                 ],

@@ -50,6 +50,7 @@ class Feed:
                 name=self.__faker.text(max_nb_chars=20),
                 link=self.__faker.url(),
                 channel_id=self.__faker.random_int(min=10**10, max=10**12),
+                must_subscribe=self.__faker.boolean(chance_of_getting_true=80),
             )
             self.__session.add(channel)
         await self.__session.commit()
@@ -63,6 +64,7 @@ class Feed:
                 telegram_id=self.__faker.random_int(min=10**10, max=10**12),
                 is_active=self.__faker.boolean(chance_of_getting_true=80),
                 language=random.choice(["en", "uz", "ru"]),
+                created_at=self.__faker.date_time(end_datetime=datetime.now()),
             )
             self.__session.add(user)
         await self.__session.commit()
@@ -187,10 +189,16 @@ class Feed:
     async def run(self):
         started = datetime.now()
         await self._feed_channel_model(100)
-        max_users = await self._feed_user_model(100_000)
-        max_levels = await self._feed_level_model(10)
-        max_topics = await self._feed_topic_model(10)
-        max_test_types = await self._feed_type_model(10)
+        max_users = await self._feed_user_model(10_000)
+        max_levels = await self._feed_level_model(4)
+        max_topics = await self._feed_topic_model(4)
+        await self._feed_user_statistics_model(
+            count=100,
+            user_id=max_users,
+            level_id=max_levels,
+            topic_id=max_topics,
+        )
+        max_test_types = await self._feed_type_model(2)
         max_options = await self._feed_option_model(count=4_000)
 
         max_tests = await self._feed_test_model(
@@ -205,12 +213,6 @@ class Feed:
             user_id=max_users,
             test_id=max_tests,
             option_id=max_options,
-        )
-        await self._feed_user_statistics_model(
-            count=100,
-            user_id=max_users,
-            level_id=max_levels,
-            topic_id=max_topics,
         )
         print(f"Duration: {datetime.now() - started}")
         print("\nSuccessfully fed the data to the models\n")

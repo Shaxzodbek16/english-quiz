@@ -11,7 +11,10 @@ router = Router()
 async def show_language_selection(
     message: Message, i18n: I18nMiddleware, locale: str
 ) -> None:
-    user = await get_user_by_telegram_id(message.from_user.id)
+    tg_user = message.from_user
+    if tg_user is None:
+        return
+    user = await get_user_by_telegram_id(tg_user.id)
     if not user:
         from app.bot.controllers.users import create_user
 
@@ -43,7 +46,7 @@ async def settings_language_callback(
 ) -> None:
     if callback.message is None:
         return
-    await show_language_selection(callback.message, i18n, locale)
+    await show_language_selection(callback.message, i18n, locale)  # type: ignore
     await callback.answer()
 
 
@@ -61,7 +64,7 @@ async def settings_notification_callback(
 async def process_language_selection(
     callback: CallbackQuery, i18n: I18nMiddleware, locale: str
 ) -> None:
-    lang = callback.data.split("_")[1]
+    lang = callback.data.split("_")[1]  # type: ignore
     user_id = callback.from_user.id
 
     await update_user_language(user_id, lang)
@@ -69,5 +72,5 @@ async def process_language_selection(
     locale = await i18n.get_locale(callback, {"event_from_user": callback.from_user})
     confirmation_text = i18n._("language_set", locale, lang=lang.capitalize())
 
-    await callback.message.reply(confirmation_text)
+    await callback.message.reply(confirmation_text)  # type: ignore
     await callback.answer()

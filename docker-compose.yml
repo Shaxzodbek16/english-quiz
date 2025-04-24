@@ -1,11 +1,16 @@
 services:
   redis:
-    image: redis:latest
+    image: redis:7
     container_name: redis-english-quiz
+    environment:
+      - REDIS_PASSWORD=redis
+      - REDIS_USERNAME=redis
     ports:
       - "6379:6379"
+    networks:
+      - app-network
   postgres:
-    image: postgres:latest
+    image: postgres:17-alpine
     container_name: postgres-english-quiz
     restart: on-failure
     environment:
@@ -33,7 +38,6 @@ services:
     depends_on:
       - postgres
       - redis
-      - rabbitmq
     volumes:
       - ./backend:/app
     working_dir: /app
@@ -44,7 +48,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "3000:3000"
     depends_on:
       - backend
     volumes:

@@ -1,8 +1,8 @@
-"""initial
+"""Initial migration
 
-Revision ID: 6f849a29de45
+Revision ID: d258c629b75d
 Revises: 
-Create Date: 2025-04-19 10:25:16.612346
+Create Date: 2025-04-23 05:20:17.515916
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "6f849a29de45"
+revision: str = "d258c629b75d"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -55,6 +55,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("link", sa.String(), nullable=False),
         sa.Column("channel_id", sa.BigInteger(), nullable=False),
+        sa.Column("must_subscribe", sa.Boolean(), nullable=False),
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column(
             "created_at",
@@ -160,6 +161,7 @@ def upgrade() -> None:
         sa.Column("first_name", sa.String(length=255), nullable=False),
         sa.Column("last_name", sa.String(length=255), nullable=True),
         sa.Column("telegram_id", sa.BigInteger(), nullable=False),
+        sa.Column("profile_picture", sa.String(length=255), nullable=True),
         sa.Column("language", sa.String(length=10), nullable=True),
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),

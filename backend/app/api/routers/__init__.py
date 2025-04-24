@@ -21,6 +21,8 @@ from app.api.routers.user_tests import router as user_tests_router
 from app.api.routers.users import router as users_router
 from app.api.routers.content import router as content_router
 from app.api.routers.test_types import router as test_type_router
+from app.api.routers.channel import router as channel_router
+from app.api.routers.statistics import router as statistics_router
 
 v1_base_router.include_router(admin_router)
 v1_base_router.include_router(admin_auth_router)
@@ -34,6 +36,8 @@ v1_base_router.include_router(user_statistics_router)
 v1_base_router.include_router(user_tests_router)
 v1_base_router.include_router(users_router)
 v1_base_router.include_router(content_router)
+v1_base_router.include_router(channel_router)
+v1_base_router.include_router(statistics_router)
 
 __all__ = [
     "v1_base_router",

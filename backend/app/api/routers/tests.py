@@ -26,11 +26,16 @@ async def get_all_tests(
     type_id: int = Query(..., ge=1),
     page: int = Query(1, ge=1),
     size: int = Query(15, ge=1, le=100),
-    current_user: AdminUsers | User = Depends(get_current_user),  # noqa
+    current_user: AdminUsers | User = Depends(get_current_user),
     tests_controller: TestsController = Depends(),
 ) -> Sequence[TestResponseSchema]:
     return await tests_controller.get_all_tests(
-        level_id=level_id, topic_id=topic_id, type_id=type_id, page=page, size=size
+        level_id=level_id,
+        topic_id=topic_id,
+        type_id=type_id,
+        page=page,
+        size=size,
+        current_user=current_user,
     )
 
 
@@ -43,10 +48,10 @@ async def get_all_tests(
 )
 async def get_test_by_id(
     test_id: int,
-    current_user: AdminUsers | User = Depends(get_current_user),  # noqa
+    current_user: AdminUsers | User = Depends(get_current_user),
     tests_controller: TestsController = Depends(),
 ) -> TestResponseSchema:
-    return await tests_controller.get_test_by_id(test_id)
+    return await tests_controller.get_test_by_id(test_id, current_user=current_user)
 
 
 @router.post(

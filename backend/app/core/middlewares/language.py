@@ -17,7 +17,7 @@ def load_translations(lang: str) -> Dict[str, str]:
 
 
 class I18nMiddleware:
-    def __init__(self):
+    def __init__(self) -> None:
         self.translations: Dict[str, Dict[str, str]] = {}
         for lang in SUPPORTED_LANGUAGES:
             self.translations[lang] = load_translations(lang)

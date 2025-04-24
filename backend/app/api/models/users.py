@@ -1,8 +1,12 @@
 from sqlalchemy import BigInteger, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+from datetime import datetime, UTC
 
 from app.core.models.base import Base
+from app.core.settings import get_settings, Settings
+
+settings: Settings = get_settings()
 
 if TYPE_CHECKING:
     from app.api.models import UserStatistic, UserTest
@@ -14,7 +18,12 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     telegram_id: Mapped[int] = mapped_column(
-        BigInteger, unique=True, nullable=False, index=True
+        BigInteger, nullable=False, index=True, unique=True
+    )
+    profile_picture: Mapped[str] = mapped_column(
+        String(255),
+        nullable=True,
+        default=f"{settings.BASE_URL}/static/images/default.jpg",
     )
     language: Mapped[str | None] = mapped_column(
         String(10), nullable=True, default="en"
@@ -27,6 +36,13 @@ class User(Base):
     user_statistics: Mapped[list["UserStatistic"]] = relationship(
         "UserStatistic", back_populates="user"
     )
+
+    def update(self, data: dict[str, Any]) -> "User":
+        for key, value in data.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+        setattr(self, "created_at", datetime.now(UTC))
+        return self
 
     @property
     def full_name(self) -> str:
@@ -43,6 +59,7 @@ class User(Base):
             "last_name": self.last_name,
             "telegram_id": self.telegram_id,
             "is_active": self.is_active,
+            "profile_picture": self.profile_picture,
             "language": self.language,
             "created_at": self.created_at,
             "updated_at": self.updated_at,

@@ -1,48 +1,45 @@
-import { useState } from 'react';
-import './App.css';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import PrivateRoute from "./components/PrivateRoute";
+import Login from "./pages/Login";
+import Levels from "./pages/Levels";
+import Topics from "./pages/Topics";
+import Tests from "./pages/Tests";
+import Admin from "./pages/Admin";
+import Profile from "./pages/Profile";
 
-function App() {
-  const [level, setLevel] = useState('');
-  const [start, setStart] = useState(false);
-
-  const handleStart = () => {
-    if (level) setStart(true);
-    else alert("Please select your level first!");
-  };
+const App = () => {
+  const queryClient = new QueryClient();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center p-4">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">English Quiz</h1>
-        <p className="text-gray-600 mb-6">Test your English skills based on your level</p>
-
-        {!start ? (
-          <>
-            <select
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
-              className="w-full mb-4 px-4 py-2 border rounded-xl text-gray-700"
-            >
-              <option value="">Select level</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </select>
-            <button
-              onClick={handleStart}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl w-full transition"
-            >
-              Start Quiz
-            </button>
-          </>
-        ) : (
-          <div className="text-green-600 font-semibold text-lg">
-            🚀 Starting quiz for <span className="capitalize">{level}</span> level...
-          </div>
-        )}
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route element={<PrivateRoute />}>
+                <Route path="/levels" element={<Levels />} />
+                <Route path="/topics/:levelId" element={<Topics />} />
+                <Route path="/tests/:levelId/:topicId" element={<Tests />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
-}
+};
 
 export default App;
