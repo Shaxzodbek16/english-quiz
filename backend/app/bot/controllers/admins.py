@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from sqlalchemy.future import select
 
 from app.api.models import AdminUsers
@@ -12,7 +14,7 @@ async def get_admin_by_telegram_id(telegram_id: int) -> AdminUsers | None:
         return user.scalar_one_or_none()
 
 
-async def get_admin_users() -> list[AdminUsers]:
+async def get_admin_users() -> Sequence[AdminUsers]:
     async with get_session_without_depends() as session:
         users = await session.execute(select(AdminUsers))
         return users.scalars().all()
