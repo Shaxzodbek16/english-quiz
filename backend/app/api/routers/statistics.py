@@ -4,7 +4,7 @@ from app.api.controllers.statistics import StatisticsController
 from app.api.models import AdminUsers, User
 from app.api.schemas.statistics import YearlyUsersResponseModel, DashboardResponseModel
 from app.api.utils.admins import get_current_user
-
+from app.tasks.celery_worker import test_task
 
 router = APIRouter(
     prefix="/statistics",
@@ -55,6 +55,7 @@ async def get_yearly_statistics(
 )
 async def get_xlsx_statistics(
     statistics_controller: StatisticsController = Depends(),
-    current_user: AdminUsers | User = Depends(get_current_user),
+    # current_user: AdminUsers | User = Depends(get_current_user),
 ):
-    pass
+    test_task.delay("Hello, Jasur!")
+    return {"details": "Task has been queued"}
