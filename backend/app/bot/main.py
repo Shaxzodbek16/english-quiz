@@ -9,6 +9,7 @@ from aiogram.enums import ParseMode
 from app.core.settings import get_settings, Settings
 from app.bot.routers import v1_router
 from app.core.middlewares.language import I18nMiddleware
+from app.core.middlewares.throttling import ThrottlingMiddleware
 
 settings: Settings = get_settings()
 dp = Dispatcher()
@@ -20,9 +21,12 @@ async def main() -> None:
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
+    throttling_middleware = ThrottlingMiddleware(limit_time=1, limit_count=2)
+
     i18n_middleware = I18nMiddleware()
     dp.message.middleware(i18n_middleware)
     dp.callback_query.middleware(i18n_middleware)
+    dp.update.middleware(throttling_middleware)
 
     dp.include_router(v1_router)
 
