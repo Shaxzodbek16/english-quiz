@@ -9,7 +9,7 @@ services:
 
 
   postgres:
-    image: postgres:17.4
+    image: postgres:17-alpine
     container_name: postgres-english-quiz
     restart: on-failure
     environment:
@@ -26,7 +26,7 @@ services:
 
   rabbitmq:
     container_name: rabbitmq-english-quiz
-    image: rabbitmq:3.12-management
+    image: rabbitmq:3.13.0-management
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -48,10 +48,26 @@ services:
       - ./backend:/app
     working_dir: /app
     command: >
-      sh -c "./run.sh & ./bot.sh & celery -A app.tasks.celery_worker worker --loglevel=info & wait"
+      sh -c "./run.sh & ./bot.sh & wait"
     networks:
       - app-network
 
+  celery:
+    container_name: celery-english-quiz
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+      - redis
+      - rabbitmq
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: >
+      celery -A app.server.celery_worker worker --loglevel=info --pool=solo
+    networks:
+      - app-network
 
 
 #  frontend:

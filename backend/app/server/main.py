@@ -15,6 +15,7 @@ def get_ready() -> None:
     os.makedirs("media/uploads/images", exist_ok=True)
     os.makedirs("media/uploads/videos", exist_ok=True)
     os.makedirs("media/uploads/docs", exist_ok=True)
+    os.makedirs("media/excel", exist_ok=True)
     os.makedirs("static/images", exist_ok=True)
     os.makedirs("static/videos", exist_ok=True)
     os.makedirs("static/docs", exist_ok=True)

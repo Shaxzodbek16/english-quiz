@@ -13,13 +13,13 @@ from app.core.middlewares.throttling import ThrottlingMiddleware
 
 settings: Settings = get_settings()
 dp = Dispatcher()
+bot = Bot(
+    token=settings.BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+)
 
 
 async def main() -> None:
-    bot = Bot(
-        token=settings.BOT_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-    )
 
     throttling_middleware = ThrottlingMiddleware(limit_time=1, limit_count=2)
 
