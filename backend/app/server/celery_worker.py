@@ -14,4 +14,3 @@ app.autodiscover_tasks(
         "app.core.tasks",
     ]
 )
-
