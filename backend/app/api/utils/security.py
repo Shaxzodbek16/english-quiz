@@ -30,4 +30,4 @@ def get_telegram_id(hashed_telegram_id: str) -> int:
 
 
 if __name__ == "__main__":
-    print(hash_telegram_id(211980759318))
+    print(hash_telegram_id(6521856185))

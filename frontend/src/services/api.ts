@@ -63,7 +63,12 @@ export interface UserStatistics {
 // Auth functions
 export const login = async (userId: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/user/login/?user=${userId}`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/user/login/?user=${userId}`,{
+      method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
     
     if (!response.ok) {
       throw new Error(`Login failed: ${response.statusText}`);
